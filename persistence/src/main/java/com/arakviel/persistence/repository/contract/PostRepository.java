@@ -7,5 +7,5 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface PostRepository extends Repository<Post>, ManyToMany {
-    Set<Tag> getTags(UUID postId);
+    Set<Tag> findAllTags(UUID postId);
 }

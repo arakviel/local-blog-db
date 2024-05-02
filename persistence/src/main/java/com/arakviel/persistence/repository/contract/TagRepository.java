@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface TagRepository extends Repository<Tag>, ManyToMany {
 
-    Set<Post> getPosts(UUID tagId);
+    Set<Post> findAllPosts(UUID tagId);
 }

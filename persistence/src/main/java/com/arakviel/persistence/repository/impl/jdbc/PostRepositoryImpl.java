@@ -22,10 +22,10 @@ public class PostRepositoryImpl extends GenericJdbcRepository<Post> implements P
 
     public PostRepositoryImpl(
             ConnectionManager connectionManager,
-            PostRowMapper rowMapper,
+            PostRowMapper postRowMapper,
             TagRowMapper tagRowMapper,
             JdbcManyToMany<Tag> jdbcManyToMany) {
-        super(connectionManager, rowMapper, TableNames.POSTS.getName());
+        super(connectionManager, postRowMapper, TableNames.POSTS.getName());
         this.connectionManager = connectionManager;
         this.tagRowMapper = tagRowMapper;
         this.jdbcManyToMany = jdbcManyToMany;
@@ -34,6 +34,7 @@ public class PostRepositoryImpl extends GenericJdbcRepository<Post> implements P
     @Override
     protected List<String> tableAttributes() {
         return List.of(
+                "slug",
                 "title",
                 "description",
                 "body",
@@ -47,6 +48,7 @@ public class PostRepositoryImpl extends GenericJdbcRepository<Post> implements P
     @Override
     protected List<Object> tableValues(Post post) {
         return List.of(
+                post.slug(),
                 post.title(),
                 post.description(),
                 post.body(),
@@ -58,11 +60,12 @@ public class PostRepositoryImpl extends GenericJdbcRepository<Post> implements P
     }
 
     @Override
-    public Set<Tag> getTags(UUID postId) {
+    public Set<Tag> findAllTags(UUID postId) {
         final String sql =
                 """
                 SELECT t.id,
-                       t.name
+                       t.name,
+                       t.slug
                   FROM tags AS t
                        JOIN post_tag AS pt
                          ON t.id = pt.tag_id

@@ -2,6 +2,8 @@ package com.arakviel.persistence.repository.mapper.impl;
 
 import com.arakviel.persistence.entity.Post;
 import com.arakviel.persistence.entity.User;
+import com.arakviel.persistence.entity.proxy.Tags;
+import com.arakviel.persistence.entity.proxy.TagsProxy;
 import com.arakviel.persistence.exception.EntityNotFoundException;
 import com.arakviel.persistence.repository.contract.PostRepository;
 import com.arakviel.persistence.repository.contract.UserRepository;
@@ -16,11 +18,11 @@ import org.springframework.stereotype.Component;
 public class PostRowMapper implements RowMapper<Post> {
 
     private final UserRepository userRepository;
-    private final PostRepository postRepository;
+    private final Tags tags;
 
-    public PostRowMapper(UserRepository userRepository, PostRepository postRepository) {
+    public PostRowMapper(UserRepository userRepository, Tags tags) {
         this.userRepository = userRepository;
-        this.postRepository = postRepository;
+        this.tags = tags;
     }
 
     @Override
@@ -37,6 +39,7 @@ public class PostRowMapper implements RowMapper<Post> {
                                                         userId}"));
         return new Post(
                 id,
+                rs.getString("slug"),
                 rs.getString("title"),
                 rs.getString("description"),
                 rs.getString("body"),
@@ -46,6 +49,6 @@ public class PostRowMapper implements RowMapper<Post> {
                 rs.getTimestamp("updated_at").toLocalDateTime(),
                 userId,
                 user,
-                postRepository.getTags(id));
+                tags);
     }
 }

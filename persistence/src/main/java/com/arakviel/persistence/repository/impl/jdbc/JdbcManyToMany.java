@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -25,7 +26,7 @@ public class JdbcManyToMany<T> {
             UUID entityId, String sql, RowMapper<T> rowMapper, String exceptionMessage) {
         try (Connection connection = connectionManager.get();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, entityId.toString());
+            statement.setObject(1, entityId, Types.OTHER);
             ResultSet resultSet = statement.executeQuery();
 
             Set<T> entities = new LinkedHashSet<>();
@@ -42,8 +43,8 @@ public class JdbcManyToMany<T> {
             UUID firstId, UUID secondId, String sql, String exceptionMessage) {
         try (Connection connection = connectionManager.get();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, firstId.toString());
-            statement.setString(2, secondId.toString());
+            statement.setObject(1, firstId, Types.OTHER);
+            statement.setObject(2, secondId, Types.OTHER);
             return statement.executeUpdate() > 0;
         } catch (SQLException throwables) {
             throw new EntityDeleteException(exceptionMessage);

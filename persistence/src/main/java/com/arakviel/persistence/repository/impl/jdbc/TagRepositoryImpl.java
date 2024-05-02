@@ -39,15 +39,19 @@ public class TagRepositoryImpl extends GenericJdbcRepository<Tag> implements Tag
     }
 
     @Override
-    public Set<Post> getPosts(UUID tagId) {
+    public Set<Post> findAllPosts(UUID tagId) {
         final String sql =
                 """
                 SELECT p.id,
-                       p.user_id,
+                       p.slug,
                        p.title,
+                       p.description,
                        p.body,
+                       p.image,
+                       p.is_published,
                        p.created_at,
-                       p.updated_at
+                       p.updated_at,
+                       p.user_id
                   FROM posts AS p
                        JOIN post_tag AS pt
                          ON p.id = pt.post_id

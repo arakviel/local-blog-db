@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,18 +46,17 @@ public abstract class GenericJdbcRepository<T extends Entity> implements Reposit
     public Optional<T> findBy(String column, Object value) {
         final String sql =
                 STR."""
-            SELECT *
-              FROM \{
-                        tableName}
-             WHERE \{
-                        column} = ?
-        """;
+                    SELECT *
+                      FROM \{tableName}
+                     WHERE \{column} = ?
+                """;
 
         UUID id = (UUID) value;
         try (Connection connection = connectionManager.get();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, id.toString());
+            statement.setObject(1, id, Types.OTHER);
             ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
             return Optional.ofNullable(rowMapper.mapRow(resultSet));
         } catch (SQLException throwables) {
             throw new EntityNotFoundException(
@@ -180,7 +180,7 @@ public abstract class GenericJdbcRepository<T extends Entity> implements Reposit
 
         try (Connection connection = connectionManager.get();
                 PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, id.toString());
+            statement.setObject(1, id, Types.OTHER);
 
             return statement.executeUpdate() > 0;
         } catch (SQLException throwables) {
