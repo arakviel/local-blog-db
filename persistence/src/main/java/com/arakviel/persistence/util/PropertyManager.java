@@ -1,21 +1,32 @@
 package com.arakviel.persistence.util;
 
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Component
 public final class PropertyManager {
     private static final Properties PROPERTIES = new Properties();
-
-    static {
+    public PropertyManager() {
         loadProperties();
     }
+    public PropertyManager(InputStream applicationProperties) {
+        try (applicationProperties) {
+            PROPERTIES.load(applicationProperties);
+        } catch (IOException e) {
+            // LOGGER.error("failed to read properties. %s".formatted(e));
+            throw new RuntimeException(e);
+        }
+    }
 
-    public static String get(String key) {
+    public String get(String key) {
         return PROPERTIES.getProperty(key);
     }
 
-    private static void loadProperties() {
+    private void loadProperties() {
         try (InputStream applicationProperties =
                 PropertyManager.class
                         .getClassLoader()
@@ -26,6 +37,4 @@ public final class PropertyManager {
             throw new RuntimeException(e);
         }
     }
-
-    private PropertyManager() {}
 }

@@ -21,8 +21,8 @@ public class TagRowMapper implements RowMapper<Tag> {
     public Tag mapRow(ResultSet rs) throws SQLException {
         return new Tag(
                 UUID.fromString(rs.getString("id")),
-            rs.getString("name"),
-            rs.getString("slug"),
-            posts);
+                rs.getString("name"),
+                rs.getString("slug"),
+                posts);
     }
 }

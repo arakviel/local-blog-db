@@ -14,8 +14,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserRepositoryImpl extends GenericJdbcRepository<User> implements UserRepository {
 
-    public UserRepositoryImpl(ConnectionManager connectionManager, UserRowMapper userMapper) {
-        super(connectionManager, userMapper, TableNames.USERS.getName());
+    public UserRepositoryImpl(ConnectionManager connectionManager, UserRowMapper userRowMapper) {
+        super(connectionManager, userRowMapper, TableNames.USERS.getName());
     }
 
     @Override

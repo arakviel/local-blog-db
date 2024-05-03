@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
-
 @Component
 public class TagsProxy implements Tags {
     private final ApplicationContext applicationContext;
@@ -23,5 +22,4 @@ public class TagsProxy implements Tags {
         Tags tags = pId -> Collections.unmodifiableSet(postRepository.findAllTags(pId));
         return tags.get(postId);
     }
-
 }

@@ -78,6 +78,6 @@ CREATE TABLE post_tag(
     post_id UUID NOT NULL,
     tag_id  UUID NOT NULL,
     PRIMARY KEY(post_id, tag_id),
-    CONSTRAINT fk_post_tag_posts FOREIGN KEY(post_id) REFERENCES posts(id),
-    CONSTRAINT fk_post_tag_tags FOREIGN KEY(tag_id) REFERENCES tags(id)
+    CONSTRAINT fk_post_tag_posts FOREIGN KEY(post_id) REFERENCES posts(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT fk_post_tag_tags FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE ON UPDATE CASCADE
 );
