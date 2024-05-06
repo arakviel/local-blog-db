@@ -6,27 +6,31 @@ import com.arakviel.persistence.entity.User.Role;
 import com.arakviel.persistence.util.ConnectionManager;
 import com.arakviel.persistence.util.DatabaseInitializer;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-public class Main {
+public class PersistenceMain {
+
+    public static AnnotationConfigApplicationContext persistenceContext;
 
     public static void main(String[] args) {
-        var context = new AnnotationConfigApplicationContext(PersistenceConfig.class);
-        var connectionManager = context.getBean(ConnectionManager.class);
-        var databaseInitializer = context.getBean(DatabaseInitializer.class);
+        String hexString = "0x89504E470D0A1A0A0000000D4948445200000030000000300806000000F9B78C0000000970485973000000EC400000EC40195F36F000000017352474200AECE1CE90000000467414D410000B18F0BFC6105000000097048597300000EC400000EC40195F36F000000017352474200000000527443436F6C6F7253706163652E6465660000000049454E44AE426082";
+        byte[] imageBytes = hexStringToByteArray(hexString);
+
+        persistenceContext = new AnnotationConfigApplicationContext(PersistenceConfig.class);
+        var connectionManager = persistenceContext.getBean(ConnectionManager.class);
+        var databaseInitializer = persistenceContext.getBean(DatabaseInitializer.class);
 
         try {
             databaseInitializer.init();
-            var persistenceContext = context.getBean(PersistenceContext.class);
+            var persistenceContext = PersistenceMain.persistenceContext.getBean(PersistenceContext.class);
             persistenceContext.users.registerNew(
                     new User(
                             null,
                             "arakviel",
                             "arakviel@gmail.com",
                             "password",
-                            "avatar.jpg",
+                        imageBytes,
                             LocalDate.of(1998, 2, 25),
                             Role.ADMIN));
 
@@ -36,7 +40,7 @@ public class Main {
                     "arakviel2",
                     "arakviel2@gmail.com",
                     "password2",
-                    "avatar2.jpg",
+                    imageBytes,
                     LocalDate.of(1998, 2, 25),
                     Role.ADMIN));
 
@@ -47,7 +51,7 @@ public class Main {
                     "mike_wilson1",
                     "mike.wilson@gmail.com",
                     "password5",
-                    "avatar5.jpg",
+                    imageBytes,
                     LocalDate.of(1998, 2, 25),
                     Role.GENERAL)
             );
@@ -57,7 +61,7 @@ public class Main {
                     "emily_brown2",
                     "emily.brown2@gmail.com",
                     "password5",
-                    "avatar5.jpg",
+                    imageBytes,
                     LocalDate.of(1998, 2, 25),
                     Role.GENERAL)
             );
@@ -72,5 +76,26 @@ public class Main {
         } finally {
             connectionManager.closePool();
         }
+    }
+
+    private static byte[] hexStringToByteArray(String hexString) {
+        if (hexString.startsWith("0x")) {
+            hexString = hexString.substring(2);
+        }
+
+        // Ensure the hex string length is even
+        if (hexString.length() % 2 != 0) {
+            hexString = "0" + hexString;
+        }
+
+        int len = hexString.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4)
+                                  + Character.digit(hexString.charAt(i + 1), 16));
+        }
+
+        return data;
     }
 }

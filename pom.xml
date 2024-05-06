@@ -10,6 +10,7 @@
   <packaging>pom</packaging>
   <modules>
     <module>persistence</module>
+    <module>domain</module>
   </modules>
 
   <properties>

@@ -41,7 +41,7 @@ public class PostRowMapper implements RowMapper<Post> {
                 rs.getString("title"),
                 rs.getString("description"),
                 rs.getString("body"),
-                rs.getString("image"),
+                rs.getBytes("image"),
                 rs.getBoolean("is_published"),
                 rs.getTimestamp("created_at").toLocalDateTime(),
                 rs.getTimestamp("updated_at").toLocalDateTime(),

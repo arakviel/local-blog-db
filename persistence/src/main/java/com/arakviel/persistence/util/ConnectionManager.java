@@ -1,7 +1,5 @@
 package com.arakviel.persistence.util;
 
-import com.arakviel.persistence.context.GenericUnitOfWork;
-import jakarta.annotation.PostConstruct;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -34,9 +32,14 @@ public final class ConnectionManager {
     public Connection get() {
         try {
             LOGGER.info("connection received from pool[%d]".formatted(pool.size()));
-            return pool.take();
+            Connection connection = pool.take();
+            connection.setAutoCommit(true);
+            return connection;
         } catch (InterruptedException e) {
             LOGGER.error("failed to take connection from pool. %s".formatted(e));
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            LOGGER.error("failed to set auto commit for connection from pool. %s".formatted(e));
             throw new RuntimeException(e);
         }
     }

@@ -17,7 +17,7 @@ public class UserRowMapper implements RowMapper<User> {
                 rs.getString("username"),
                 rs.getString("email"),
                 rs.getString("password"),
-                rs.getObject("avatar", String.class),
+                rs.getBytes("avatar"),
                 rs.getTimestamp("birthday").toLocalDateTime().toLocalDate(),
                 User.Role.valueOf(rs.getString("role")));
     }
