@@ -1,5 +1,6 @@
-package com.arakviel.persistence;
+package com.arakviel;
 
+import com.arakviel.persistence.ApplicationConfig;
 import com.arakviel.persistence.context.factory.PersistenceContext;
 import com.arakviel.persistence.entity.User;
 import com.arakviel.persistence.entity.User.Role;
@@ -14,25 +15,37 @@ public class Main {
     public static AnnotationConfigApplicationContext persistenceContext;
 
     public static void main(String[] args) {
-        String hexString = "0x89504E470D0A1A0A0000000D4948445200000030000000300806000000F9B78C0000000970485973000000EC400000EC40195F36F000000017352474200AECE1CE90000000467414D410000B18F0BFC6105000000097048597300000EC400000EC40195F36F000000017352474200000000527443436F6C6F7253706163652E6465660000000049454E44AE426082";
-        byte[] imageBytes = hexStringToByteArray(hexString);
-
         persistenceContext = new AnnotationConfigApplicationContext(ApplicationConfig.class);
         var connectionManager = persistenceContext.getBean(ConnectionManager.class);
         var databaseInitializer = persistenceContext.getBean(DatabaseInitializer.class);
 
         try {
             databaseInitializer.init();
+
+        } finally {
+            connectionManager.closePool();
+        }
+
+        //test(databaseInitializer, connectionManager);
+    }
+
+    private static void test(DatabaseInitializer databaseInitializer,
+        ConnectionManager connectionManager) {
+        String hexString = "0x89504E470D0A1A0A0000000D4948445200000030000000300806000000F9B78C0000000970485973000000EC400000EC40195F36F000000017352474200AECE1CE90000000467414D410000B18F0BFC6105000000097048597300000EC400000EC40195F36F000000017352474200000000527443436F6C6F7253706163652E6465660000000049454E44AE426082";
+        byte[] imageBytes = hexStringToByteArray(hexString);
+
+        try {
+            databaseInitializer.init();
             var persistenceContext = Main.persistenceContext.getBean(PersistenceContext.class);
             persistenceContext.users.registerNew(
-                    new User(
-                            null,
-                            "arakviel",
-                            "arakviel@gmail.com",
-                            "password",
-                        imageBytes,
-                            LocalDate.of(1998, 2, 25),
-                            Role.ADMIN));
+                new User(
+                    null,
+                    "arakviel",
+                    "arakviel@gmail.com",
+                    "password",
+                    imageBytes,
+                    LocalDate.of(1998, 2, 25),
+                    Role.ADMIN));
 
             persistenceContext.users.registerNew(
                 new User(

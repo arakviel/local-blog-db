@@ -1,5 +1,7 @@
 package com.arakviel.domain.exception;
 
+import static java.lang.StringTemplate.STR;
+
 import java.io.Serial;
 
 public class AccessDeniedException extends RuntimeException {

@@ -6,7 +6,9 @@ import com.arakviel.persistence.context.factory.PersistenceContext;
 import com.arakviel.persistence.entity.User;
 import com.arakviel.persistence.repository.contract.UserRepository;
 import com.password4j.Password;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AuthenticationService {
 
     private final UserRepository userRepository;

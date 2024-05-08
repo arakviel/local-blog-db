@@ -15,29 +15,33 @@ import com.arakviel.persistence.entity.filter.UserFilterDto;
 import com.arakviel.persistence.exception.EntityNotFoundException;
 import com.arakviel.persistence.repository.contract.UserRepository;
 import jakarta.validation.Validator;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import com.password4j.Password;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UserService {
-
 
     private final UserContext userContext;
     private final UserRepository userRepository;
     private final AuthorizeService authorizeService;
+    private final FileService fileService;
     private final Validator validator;
+    private Path defaultAvatar;
 
     public UserService(PersistenceContext persistenceContext, AuthorizeService authorizeService,
-        Validator validator) {
+        FileService fileService, Validator validator) {
         this.userContext = persistenceContext.users;
         this.userRepository = persistenceContext.users.repository;
         this.authorizeService = authorizeService;
+        this.fileService = fileService;
         this.validator = validator;
+        // вказуємо дефолтний аватар
+        defaultAvatar = fileService.getPathFromResource("default-avatar.png");
     }
 
     public User findById(UUID id) {
@@ -87,7 +91,7 @@ public class UserService {
             userStoreDto.username(),
             userStoreDto.email(),
             Password.hash(userStoreDto.password()).withBcrypt().getResult(),
-            getAvatar(userStoreDto.avatar()),
+            fileService.getBytes(userStoreDto.avatar()),
             userStoreDto.birthday(),
             Objects.nonNull(userStoreDto.role()) ? userStoreDto.role() : Role.GENERAL
         );
@@ -108,15 +112,14 @@ public class UserService {
         if (!authorizeService.canUpdate(oldUser)) {
             throw AccessDeniedException.notAuthorOrBannedUser("оновлювати користувача");
         }
-
         User user = new User(
             userUpdateDto.id(),
             userUpdateDto.username(),
             userUpdateDto.email(),
             Objects.nonNull(userUpdateDto.password()) ?
                 Password.hash(userUpdateDto.password()).withBcrypt().getResult() : null,
-            Objects.nonNull(userUpdateDto.avatar()) ?
-                getAvatar(userUpdateDto.avatar()) : null,
+            !userUpdateDto.avatar().equals(defaultAvatar) ?
+                fileService.getBytes(userUpdateDto.avatar()) : fileService.getBytes(defaultAvatar),
             userUpdateDto.birthday(),
             userUpdateDto.role()
         );
@@ -124,17 +127,5 @@ public class UserService {
         userContext.registerModified(user);
         userContext.commit();
         return userContext.getEntity();
-    }
-
-    private byte[] getAvatar(Path avatarPath) {
-        byte[] avatar = null;
-        try {
-            if (Objects.nonNull(avatarPath)) {
-                avatar = Files.readAllBytes(avatarPath);
-            }
-        } catch (IOException e) {
-            throw new ImageNotFoundException();
-        }
-        return avatar;
     }
 }
