@@ -1,14 +1,11 @@
 package com.arakviel.domain.service.impl;
 
-import com.arakviel.domain.dto.CommentUpdateDto;
 import com.arakviel.domain.dto.UserStoreDto;
 import com.arakviel.domain.dto.UserUpdateDto;
 import com.arakviel.domain.exception.AccessDeniedException;
-import com.arakviel.domain.exception.ImageNotFoundException;
 import com.arakviel.domain.exception.ValidationException;
 import com.arakviel.persistence.context.factory.PersistenceContext;
 import com.arakviel.persistence.context.impl.UserContext;
-import com.arakviel.persistence.entity.Comment;
 import com.arakviel.persistence.entity.User;
 import com.arakviel.persistence.entity.User.Role;
 import com.arakviel.persistence.entity.filter.UserFilterDto;
